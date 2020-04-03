@@ -53,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  @return A matcher for the accessibility ID of an accessible element.
  */
 + (id<GREYMatcher>)matcherForAccessibilityID:(NSString *)accessibilityID;
++ (id<GREYMatcher>)matcherForVisibleAccessibilityID:(NSString *)accessibilityID;
 
 /**
  *  Matcher for UI element with the provided accessibility @c value.
@@ -124,6 +125,7 @@ NS_ASSUME_NONNULL_BEGIN
  *          to a minimum value.
  */
 + (id<GREYMatcher>)matcherForMinimumVisiblePercent:(CGFloat)percent;
++ (id<GREYMatcher>)matcherForMaximumVisiblePercent:(CGFloat)percent;
 
 /**
  *  Matcher for UI element that is sufficiently visible to the user. EarlGrey considers elements
@@ -441,6 +443,7 @@ GREY_EXPORT id<GREYMatcher> grey_accessibilityLabel(NSString *label);
 
 /** Shorthand for GREYMatchers::matcherForAccessibilityID:. */
 GREY_EXPORT id<GREYMatcher> grey_accessibilityID(NSString *accessibilityID);
+GREY_EXPORT id<GREYMatcher> grey_visibleAccessibilityID(NSString *accessibilityID);
 
 /** Shorthand for GREYMatchers::matcherForAccessibilityValue:. */
 GREY_EXPORT id<GREYMatcher> grey_accessibilityValue(NSString *grey_accessibilityValue);
@@ -465,6 +468,7 @@ GREY_EXPORT id<GREYMatcher> grey_systemAlertViewShown(void);
 
 /** Shorthand for GREYMatchers::matcherForMinimumVisiblePercent:. */
 GREY_EXPORT id<GREYMatcher> grey_minimumVisiblePercent(CGFloat percent);
+GREY_EXPORT id<GREYMatcher> grey_maximumVisiblePercent(CGFloat percent);
 
 /** Shorthand for GREYMatchers::matcherForSufficientlyVisible. */
 GREY_EXPORT id<GREYMatcher> grey_sufficientlyVisible(void);

@@ -118,6 +118,24 @@ static const double kElementSufficientlyVisiblePercentage = 0.75;
                     nil);
 }
 
++ (id<GREYMatcher>)matcherForVisibleAccessibilityID:(NSString *)accessibilityID {
+    MatchesBlock matches = ^BOOL(id<UIAccessibilityIdentification> element) {
+        if (element.accessibilityIdentifier == accessibilityID) {
+            return YES;
+        }
+        return [element.accessibilityIdentifier isEqualToString:accessibilityID];
+    };
+    DescribeToBlock describe = ^void(id<GREYDescription> description) {
+        [description appendText:[NSString stringWithFormat:@"accessibilityID('%@')",
+                                 accessibilityID]];
+    };
+    return grey_allOf(grey_respondsToSelector(@selector(accessibilityIdentifier)),
+                      [[GREYElementMatcherBlock alloc] initWithMatchesBlock:matches
+                                                           descriptionBlock:describe],
+                      grey_minimumVisiblePercent(0.01f),
+                      nil);
+}
+
 + (id<GREYMatcher>)matcherForAccessibilityValue:(NSString *)value {
   MatchesBlock matches = ^BOOL(NSObject *element) {
     if (element.accessibilityValue == value) {
@@ -224,13 +242,28 @@ static const double kElementSufficientlyVisiblePercentage = 0.75;
   GREYFatalAssertWithMessage(percent >= 0.0f && percent <= 1.0f,
                              @"Percent %f must be in the range [0,1]", percent);
   MatchesBlock matches = ^BOOL(UIView *element) {
-    return [GREYVisibilityChecker percentVisibleAreaOfElement:element] > percent;
+      CGFloat visible = [GREYVisibilityChecker percentVisibleAreaOfElement:element];
+      return visible > percent;
   };
   DescribeToBlock describe = ^void(id<GREYDescription> description) {
     [description appendText:
         [NSString stringWithFormat:@"matcherForMinimumVisiblePercent(>=%f)", percent]];
   };
   return [[GREYElementMatcherBlock alloc] initWithMatchesBlock:matches descriptionBlock:describe];
+}
+
++ (id<GREYMatcher>)matcherForMaximumVisiblePercent:(CGFloat)percent {
+    GREYFatalAssertWithMessage(percent >= 0.0f && percent <= 1.0f,
+                               @"Percent %f must be in the range [0,1]", percent);
+    MatchesBlock matches = ^BOOL(UIView *element) {
+        CGFloat visible = [GREYVisibilityChecker percentVisibleAreaOfElement:element];
+        return visible < percent;
+    };
+    DescribeToBlock describe = ^void(id<GREYDescription> description) {
+        [description appendText:
+         [NSString stringWithFormat:@"matcherForMaximumVisiblePercent(>=%f)", percent]];
+    };
+    return [[GREYElementMatcherBlock alloc] initWithMatchesBlock:matches descriptionBlock:describe];
 }
 
 + (id<GREYMatcher>)matcherForSufficientlyVisible {
@@ -724,6 +757,10 @@ id<GREYMatcher> grey_accessibilityID(NSString *accessibilityID) {
   return [GREYMatchers matcherForAccessibilityID:accessibilityID];
 }
 
+id<GREYMatcher> grey_visibleAccessibilityID(NSString *accessibilityID) {
+    return [GREYMatchers matcherForVisibleAccessibilityID:accessibilityID];
+}
+
 id<GREYMatcher> grey_accessibilityValue(NSString *value) {
   return [GREYMatchers matcherForAccessibilityValue:value];
 }
@@ -750,6 +787,10 @@ id<GREYMatcher> grey_firstResponder(void) {
 
 id<GREYMatcher> grey_minimumVisiblePercent(CGFloat percent) {
   return [GREYMatchers matcherForMinimumVisiblePercent:percent];
+}
+
+id<GREYMatcher> grey_maximumVisiblePercent(CGFloat percent) {
+    return [GREYMatchers matcherForMaximumVisiblePercent:percent];
 }
 
 id<GREYMatcher> grey_sufficientlyVisible(void) {
